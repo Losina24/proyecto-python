@@ -29,6 +29,8 @@ def compare_words(word, secret):
     for x in word:
         j = 0;
         for y in secret:
+            if len(x) != len(y):
+                raise ValueError("La longitud de las palabras es distinta");
             if x == y:
                 if i == j:
                     same_position.append(i)
@@ -49,17 +51,32 @@ def print_word(word, same_letter_position, same_letter):
     Returns:
       transformed: La palabra aplicando las transformaciones. En el caso anterior: "Cam--"
     """
+    if str(type(same_letter)) != '<class \'list\'>' or str(type(same_letter_position)) != '<class \'list\'>':
+        raise ValueError("No son listas");
+            
+    if len(same_letter_position) > len(word):
+        raise ValueError("La longitud es mayor")
     
-    transformed = [];
+    if len(same_letter) > len(word):
+        raise ValueError("La longitud es mayor")
+
+    transformed_list = [];
     for letter in word:
-        transformed.append("-");
+        transformed_list.append("-");
     
     for i in same_letter_position:
-        transformed[i] = word[i].upper();
+        if i < 0:
+            raise ValueError("Es negativo")
+        transformed_list[i] = word[i].upper();
     
     for i in same_letter:
-        transformed[i] = word[i].lower();
+        if i < 0:
+            raise ValueError("Es negativo")
+        transformed_list[i] = word[i].lower();
 
+    transformed = "" 
+    for l in transformed_list: 
+        transformed += l 
     return str(transformed)
 
 def choose_secret_advanced(file):
@@ -73,6 +90,9 @@ def choose_secret_advanced(file):
 
      # Obtener las palabras del fichero
     words = get_file_words(file)
+
+    if len(words) < 15:
+        raise ValueError("No hay palabras suficientes");
     
     # Filtrar palabras sin acentos
     filtered_words = filter_accents(words)
@@ -88,6 +108,10 @@ def choose_secret_advanced(file):
 def get_file_words(file):
     f = open(file, mode="rt", encoding="utf-8")
     words_in_str = f.read()
+
+    if len(words_in_str) == 0:
+        raise ValueError("No hay palabras");
+
     words_in_list = words_in_str.split('\n')
     f.close()
 
@@ -127,17 +151,20 @@ def check_valid_word(selected):
 
 if __name__ == "__main__":
     #secret = choose_secret('palabras_reduced.txt')
-    selected, secret = choose_secret_advanced('palabras_extended.txt')
+    try:
+        selected, secret = choose_secret_advanced('palabras_extended.txt')
 
-    # Debug: esto es para que sepas la palabra que debes adivinar
-    print("Palabra a adivinar: "+secret)
-    for repeticiones in range(0, 6):
-        word = check_valid_word(selected)
-        same_position, same_letter = compare_words(word, secret)
-        resultado = print_word(word, same_position, same_letter)
-        print(resultado)
+        # Debug: esto es para que sepas la palabra que debes adivinar
+        print("Palabra a adivinar: "+secret)
+        for repeticiones in range(0, 6):
+            word = check_valid_word(selected)
+            same_position, same_letter = compare_words(word, secret)
+            resultado = print_word(word, same_position, same_letter)
+            print(resultado)
 
-        if word == secret:
-            print("HAS GANADO!!")
-            exit()
-    print("LO SIENTO, NO LA HAS ADIVINIDADO. LA PALABRA ERA "+secret)
+            if word == secret:
+                print("HAS GANADO!!")
+                exit()
+        print("LO SIENTO, NO LA HAS ADIVINIDADO. LA PALABRA ERA "+secret)
+    except BaseException as e:
+        print(e)
