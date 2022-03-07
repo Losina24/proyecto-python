@@ -1,3 +1,5 @@
 from wordle import *
 
-choose_secret('palabras_extended.txt');
+""" print(choose_secret('palabras_reduced.txt'));
+ """
+print(compare_words('CAMPO', 'CREMA'))
