@@ -50,17 +50,17 @@ def print_word(word, same_letter_position, same_letter):
       transformed: La palabra aplicando las transformaciones. En el caso anterior: "Cam--"
     """
     
-    res = [];
+    transformed = [];
     for letter in word:
-        res.append("-");
+        transformed.append("-");
     
     for i in same_letter_position:
-        res[i] = word[i];
+        transformed[i] = word[i].upper();
     
     for i in same_letter:
-        res[i] = word[i].lower();
-    
-    return str(res)
+        transformed[i] = word[i].lower();
+
+    return str(transformed)
 
 def choose_secret_advanced(file):
     """Dado un nombre de fichero, esta función filtra solo las palabras de 5 letras que no tienen acentos (á,é,í,ó,ú). De estas palabras, la función devuelve una lista de 15 aleatorias no repetidas y una de estas 15, se selecciona aleatoriamente como palabra secret.
@@ -73,7 +73,7 @@ def choose_secret_advanced(file):
 
      # Obtener las palabras del fichero
     words = get_file_words(file)
-
+    
     # Filtrar palabras sin acentos
     filtered_words = filter_accents(words)
 
@@ -82,6 +82,7 @@ def choose_secret_advanced(file):
 
     # Seleccionar aleatoriamente una
     secret = random.choice(selected).upper()
+
     return selected, secret
 
 def get_file_words(file):
@@ -110,24 +111,32 @@ def get_best_words(words):
             res.append(random_word);
     return res;
 
-def check_valid_word():
+def check_valid_word(selected):
     """Dada una lista de palabras, esta función pregunta al usuario que introduzca una palabra hasta que introduzca una que esté en la lista. Esta palabra es la que devolverá la función.
     Args:
       selected: Lista de palabras.
     Returns:
       word: Palabra introducida por el usuario que está en la lista.
     """
+    while 1:
+        word = input("Introduce una palabra: ").lower()
+        print(selected)
 
+        if selected.count(word) != 0:
+            return word.upper();
 
 if __name__ == "__main__":
-    secret = choose_secret('palabras_reduced.txt')
+    #secret = choose_secret('palabras_reduced.txt')
+    selected, secret = choose_secret_advanced('palabras_extended.txt')
+
     # Debug: esto es para que sepas la palabra que debes adivinar
     print("Palabra a adivinar: "+secret)
     for repeticiones in range(0, 6):
-        word = input("Introduce una nueva palabra: ")
+        word = check_valid_word(selected)
         same_position, same_letter = compare_words(word, secret)
         resultado = print_word(word, same_position, same_letter)
         print(resultado)
+
         if word == secret:
             print("HAS GANADO!!")
             exit()
